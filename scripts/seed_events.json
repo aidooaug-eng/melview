@@ -1,0 +1,5 @@
+[
+  {"eventId":"evt-001","name":"Neighborhood Book Swap","date":"2026-10-03","location":"Riverside Community Library","capacity":40,"registeredCount":0},
+  {"eventId":"evt-002","name":"Ceramics for Beginners","date":"2026-10-12","location":"Maple Street Arts Studio","capacity":18,"registeredCount":0},
+  {"eventId":"evt-003","name":"Local History Walking Tour","date":"2026-10-18","location":"Old Town Visitor Center","capacity":25,"registeredCount":0}
+]

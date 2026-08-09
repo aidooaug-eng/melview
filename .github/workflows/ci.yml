@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install cfn-lint
+        run: pip install cfn-lint
+      - uses: aws-actions/setup-sam@v2
+      - name: Validate SAM template
+        run: sam validate --lint
+      - name: Build application
+        run: sam build
+      - name: Check frontend assets
+        run: test -f frontend/index.html && test -f frontend/styles.css && test -f frontend/app.js

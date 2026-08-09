@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Melview | Event Registration</title><link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header><a class="brand" href="#home">Melview</a><nav><a href="#home">Home</a><a href="#events">Events</a><a href="#register">Register</a><a href="#tickets">My Tickets</a></nav></header>
+  <main>
+    <section id="home" class="hero"><p class="eyebrow">MAKE PLANS, EASILY</p><h1>Find your next good gathering.</h1><p>Browse community experiences, reserve a spot, and keep your tickets in one place.</p><a class="button" href="#events">Explore events</a></section>
+    <section id="events"><div class="section-heading"><div><p class="eyebrow">UPCOMING</p><h2>Events</h2></div><button id="refresh-events" class="text-button">Refresh</button></div><p id="events-status" class="status" aria-live="polite">Loading events…</p><div id="events-list" class="event-grid"></div></section>
+    <section id="register" class="panel"><p class="eyebrow">SAVE YOUR SEAT</p><h2>Register / Reserve</h2><form id="registration-form"><label>Event<select id="eventId" required><option value="">Select an event</option></select></label><label>Your name<input id="attendeeName" required maxlength="100" placeholder="Ada Lovelace"></label><label>Email address<input id="email" type="email" required placeholder="ada@example.com"></label><button class="button" type="submit">Reserve my ticket</button></form><p id="registration-status" class="status" aria-live="polite"></p></section>
+    <section id="tickets" class="panel"><p class="eyebrow">YOUR RESERVATIONS</p><h2>My Tickets</h2><form id="tickets-form" class="inline-form"><label>Email address<input id="tickets-email" type="email" required placeholder="ada@example.com"></label><button class="button" type="submit">Find tickets</button></form><p id="tickets-status" class="status" aria-live="polite"></p><div id="tickets-list" class="ticket-list"></div></section>
+  </main><footer>Melview — serverless event registration.</footer><script src="app.js"></script>
+</body></html>
