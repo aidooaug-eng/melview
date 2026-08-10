@@ -55,3 +55,71 @@ byId("tickets-form").addEventListener("submit", async (event) => {
 });
 byId("tickets-list").addEventListener("click", async (event) => { const id = event.target.dataset.cancel; if (!id) return; try { await request(`/registration/${encodeURIComponent(id)}`, { method: "DELETE" }); byId("tickets-form").requestSubmit(); loadEvents(); } catch (error) { setStatus(byId("tickets-status"), error.message, true); } });
 loadEvents();
+// Emergency cancel handler for dynamically rendered ticket cards
+document.addEventListener("click", async (event) => {
+  const button = event.target.closest("button");
+ 
+  if (!button) return;
+ 
+  const buttonText = button.textContent.trim().toLowerCase();
+ 
+  if (buttonText !== "cancel") return;
+ 
+  event.preventDefault();
+ 
+  const ticketCard = button.closest("[data-registration-id], article, li, div");
+ 
+  const registrationIdFromData =
+    button.dataset.registrationId ||
+    button.dataset.id ||
+    ticketCard?.dataset.registrationId ||
+    ticketCard?.dataset.id;
+ 
+  const ticketText = ticketCard?.innerText || "";
+ 
+  const registrationIdFromText =
+    ticketText.match(/Ticket:\s*([A-Za-z0-9-]+)/i)?.[1] ||
+    ticketText.match(/Ticket ID:\s*([A-Za-z0-9-]+)/i)?.[1] ||
+    ticketText.match(/Registration ID:\s*([A-Za-z0-9-]+)/i)?.[1];
+ 
+  const registrationId = registrationIdFromData || registrationIdFromText;
+ 
+  if (!registrationId) {
+    alert("Could not find the ticket ID for cancellation.");
+    return;
+  }
+ 
+  const confirmed = window.confirm("Cancel this ticket?");
+ 
+  if (!confirmed) return;
+ 
+  try {
+    const response = await fetch(
+      `${API_BASE_URL.replace(/\/$/, "")}/registration/${encodeURIComponent(registrationId)}`,
+      {
+        method: "DELETE",
+      }
+    );
+ 
+    const data = await response.json().catch(() => ({}));
+ 
+    if (!response.ok) {
+      throw new Error(data.message || `Cancellation failed with status ${response.status}`);
+    }
+ 
+    alert(data.message || "Registration cancelled.");
+ 
+    button.textContent = "Cancelled";
+    button.disabled = true;
+ 
+    const statusText = document.createElement("p");
+    statusText.textContent = "Ticket cancelled.";
+    statusText.style.marginTop = "0.75rem";
+    statusText.style.color = "#2f6b4f";
+ 
+    ticketCard?.appendChild(statusText);
+  } catch (error) {
+    console.error("Cancel ticket error:", error);
+    alert(error.message || "Unable to cancel ticket.");
+  }
+});

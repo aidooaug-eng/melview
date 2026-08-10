@@ -39,8 +39,18 @@ def response(status_code, body):
     return {
         "statusCode": status_code,
         "headers": HEADERS,
-        "body": json.dumps(body),
+        "body": json.dumps(convert_decimals(body)),
     }
+ 
+ 
+def is_active_registration(registration):
+    status = (
+        registration.get("registrationStatus")
+        or registration.get("status")
+        or "CONFIRMED"
+    ).upper()
+ 
+    return status not in ["CANCELLED", "CANCELED"]
  
  
 def lambda_handler(event, context):
@@ -77,9 +87,15 @@ def lambda_handler(event, context):
             registrations = result.get("Items", [])
             print(f"Fallback scan found {len(registrations)} records.")
  
-        registrations = convert_decimals(registrations)
+        active_registrations = [
+            registration
+            for registration in registrations
+            if is_active_registration(registration)
+        ]
  
-        return response(200, registrations)
+        print(f"Active registrations returned: {len(active_registrations)}")
+ 
+        return response(200, active_registrations)
  
     except Exception as error:
         print(f"Unable to load registrations: {error}")
