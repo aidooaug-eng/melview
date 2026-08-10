@@ -1,9 +1,11 @@
-const API_BASE_URL = "PASTE_API_BASE_URL_HERE";
+const API_BASE_URL =  "https://kran16o3h1.execute-api.eu-west-1.amazonaws.com/Prod";
 
 const byId = (id) => document.getElementById(id);
 const eventsList = byId("events-list");
 const eventsStatus = byId("events-status");
 const eventSelect = byId("eventId");
+let availableEvents = [];
+let selectedEvent = null;
 
 function apiUrl(path) {
   if (API_BASE_URL === "PASTE_API_BASE_URL_HERE") throw new Error("The app has not been configured with an API URL yet.");
@@ -19,22 +21,30 @@ async function request(path, options) {
 }
 async function loadEvents() {
   setStatus(eventsStatus, "Loading events…"); eventsList.innerHTML = "";
+  eventSelect.innerHTML = '<option value="">Select an event</option>';
+  selectedEvent = null;
   try {
-    const events = await request("/events");
+    const response = await request("/events");
+    const events = Array.isArray(response) ? response : response.events;
+    if (!Array.isArray(events)) throw new Error("The events API returned an unexpected response.");
+    availableEvents = events;
     if (!events.length) { setStatus(eventsStatus, "No events are available right now."); return; }
-    eventSelect.innerHTML = '<option value="">Select an event</option>';
     events.forEach((event) => {
       const remaining = Math.max(0, Number(event.capacity) - Number(event.registeredCount || 0));
-      eventsList.insertAdjacentHTML("beforeend", `<article class="event-card"><p class="eyebrow">${escapeHtml(event.date || "DATE TBA")}</p><h3>${escapeHtml(event.name)}</h3><p>${escapeHtml(event.location || "Location TBA")}</p><p>${remaining} seat${remaining === 1 ? "" : "s"} remaining</p></article>`);
-      if (remaining > 0) eventSelect.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(event.eventId)}">${escapeHtml(event.name)}</option>`);
+      eventsList.insertAdjacentHTML("beforeend", `<article class="event-card"><p class="eyebrow">${escapeHtml(event.date)} · ${escapeHtml(event.time)}</p><h3>${escapeHtml(event.name)}</h3><p>${escapeHtml(event.description)}</p><p>${escapeHtml(event.location)}</p><p>${remaining} seat${remaining === 1 ? "" : "s"} remaining</p></article>`);
+      if (remaining > 0 && event.status === "ACTIVE") eventSelect.insertAdjacentHTML("beforeend", `<option value="${escapeHtml(event.eventId)}">${escapeHtml(event.name)}</option>`);
     });
     setStatus(eventsStatus, "");
-  } catch (error) { setStatus(eventsStatus, error.message, true); }
+  } catch (error) { setStatus(eventsStatus, `Unable to load events: ${error.message}`, true); }
 }
 byId("refresh-events").addEventListener("click", loadEvents);
+eventSelect.addEventListener("change", () => {
+  selectedEvent = availableEvents.find((event) => event.eventId === eventSelect.value) || null;
+});
 byId("registration-form").addEventListener("submit", async (event) => {
   event.preventDefault(); const status = byId("registration-status");
-  const payload = { eventId: eventSelect.value, attendeeName: byId("attendeeName").value.trim(), email: byId("email").value.trim() };
+  if (!selectedEvent) { setStatus(status, "Please select an available event.", true); return; }
+  const payload = { eventId: selectedEvent.eventId, attendeeName: byId("attendeeName").value.trim(), email: byId("email").value.trim() };
   try { const result = await request("/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }); setStatus(status, `Confirmed! Ticket ID: ${result.ticket.registrationId}`); event.target.reset(); await loadEvents(); }
   catch (error) { setStatus(status, error.message, true); }
 });
