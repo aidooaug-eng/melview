@@ -36,8 +36,10 @@ def lambda_handler(event, context):
                 "attendeeName": {"S": name}, "status": {"S": "ACTIVE"}, "createdAt": {"S": created_at}},
                 "ConditionExpression": "attribute_not_exists(registrationId)"}},
             {"Update": {"TableName": EVENTS_TABLE, "Key": {"eventId": {"S": event_id}},
-                "UpdateExpression": "SET registeredCount = registeredCount + :one",
-                "ConditionExpression": "attribute_exists(eventId) AND registeredCount < capacity", "ExpressionAttributeValues": {":one": {"N": "1"}}}}
+                "UpdateExpression": "SET #registeredCount = #registeredCount + :one",
+                "ConditionExpression": "attribute_exists(#eventId) AND #status = :active AND #registeredCount < #capacity",
+                "ExpressionAttributeNames": {"#capacity": "capacity", "#registeredCount": "registeredCount", "#status": "status", "#eventId": "eventId"},
+                "ExpressionAttributeValues": {":one": {"N": "1"}, ":active": {"S": "ACTIVE"}}}}
         ])
     except ClientError as error:
         if error.response["Error"]["Code"] == "TransactionCanceledException":
