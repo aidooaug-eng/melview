@@ -1,5 +1,49 @@
-[
-  {"eventId":"evt-001","name":"Neighborhood Book Swap","date":"2026-10-03","location":"Riverside Community Library","capacity":40,"registeredCount":0},
-  {"eventId":"evt-002","name":"Ceramics for Beginners","date":"2026-10-12","location":"Maple Street Arts Studio","capacity":18,"registeredCount":0},
-  {"eventId":"evt-003","name":"Local History Walking Tour","date":"2026-10-18","location":"Old Town Visitor Center","capacity":25,"registeredCount":0}
-]
+{
+  "melview-EventsTable-LXWLJMF988KP": [
+    {
+      "PutRequest": {
+        "Item": {
+          "eventId": { "S": "evt-001" },
+          "name": { "S": "Neighborhood Book Swap" },
+          "description": { "S": "A relaxed community gathering for readers to exchange books, meet neighbours, and discover new stories." },
+          "date": { "S": "2026-10-03" },
+          "time": { "S": "14:00" },
+          "location": { "S": "Riverside Community Library" },
+          "capacity": { "N": "40" },
+          "registeredCount": { "N": "0" },
+          "status": { "S": "ACTIVE" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "eventId": { "S": "evt-002" },
+          "name": { "S": "Makers Morning" },
+          "description": { "S": "A creative meet-up for makers, small business owners, and curious builders to share ideas and practical lessons." },
+          "date": { "S": "2026-10-12" },
+          "time": { "S": "10:00" },
+          "location": { "S": "Maple Arts Studio" },
+          "capacity": { "N": "55" },
+          "registeredCount": { "N": "0" },
+          "status": { "S": "ACTIVE" }
+        }
+      }
+    },
+    {
+      "PutRequest": {
+        "Item": {
+          "eventId": { "S": "evt-003" },
+          "name": { "S": "Local History Walking Tour" },
+          "description": { "S": "A guided walk through notable local landmarks with stories from community historians and long-time residents." },
+          "date": { "S": "2026-10-18" },
+          "time": { "S": "09:30" },
+          "location": { "S": "Old Town Visitor Center" },
+          "capacity": { "N": "25" },
+          "registeredCount": { "N": "0" },
+          "status": { "S": "ACTIVE" }
+        }
+      }
+    }
+  ]
+}

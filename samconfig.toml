@@ -1,0 +1,14 @@
+version = 0.1
+
+[default.deploy.parameters]
+stack_name = "melview"
+resolve_s3 = true
+s3_prefix = "melview"
+region = "eu-west-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+parameter_overrides = "FrontendPriceClass=\"PriceClass_100\""
+image_repositories = []
+
+[default.global.parameters]
+region = "eu-west-1"
