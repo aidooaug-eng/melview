@@ -486,3 +486,151 @@ document.addEventListener(
   },
   true
 );
+/* =====================================================
+   FINAL FIX: reliable events loader and renderer
+   Uses the working /events API response shape: { events: [...] }
+   ===================================================== */
+ 
+async function loadMelviewEventsFinal() {
+  const eventsList =
+    document.getElementById("events-list") ||
+    document.querySelector(".events-list");
+ 
+  const eventsStatus =
+    document.getElementById("events-status") ||
+    document.querySelector("[data-events-status]");
+ 
+  const eventSelect =
+    document.getElementById("eventId") ||
+    document.querySelector("[name='eventId']") ||
+    document.querySelector("select");
+ 
+  if (!eventsList) {
+    console.warn("Events list container not found.");
+    return;
+  }
+ 
+  try {
+    if (eventsStatus) {
+      eventsStatus.textContent = "Loading events...";
+      eventsStatus.className = "message";
+    }
+ 
+    const response = await fetch(`${API_BASE_URL.replace(/\/$/, "")}/events`);
+    const data = await response.json();
+ 
+    if (!response.ok) {
+      throw new Error(data.message || `Unable to load events. Status ${response.status}`);
+    }
+ 
+    const events = Array.isArray(data) ? data : data.events || [];
+ 
+    eventsList.innerHTML = "";
+ 
+    if (eventSelect) {
+      eventSelect.innerHTML = '<option value="">Select an event</option>';
+    }
+ 
+    if (!events.length) {
+      if (eventsStatus) {
+        eventsStatus.textContent = "No events available yet.";
+        eventsStatus.className = "message";
+      }
+      return;
+    }
+ 
+    events.forEach((eventItem) => {
+      const eventId = eventItem.eventId || eventItem.id;
+      const name = eventItem.name || eventItem.eventName || "Untitled event";
+      const description = eventItem.description || "No description available.";
+      const date = eventItem.date || eventItem.eventDate || "";
+      const time = eventItem.time || eventItem.eventTime || "";
+      const location = eventItem.location || eventItem.venue || "";
+      const capacity = Number(eventItem.capacity || 0);
+      const registeredCount = Number(eventItem.registeredCount || 0);
+      const seatsRemaining = Math.max(capacity - registeredCount, 0);
+ 
+      const card = document.createElement("article");
+      card.className = "event-card";
+      card.dataset.eventId = eventId;
+ 
+      card.innerHTML = `
+<p class="eyebrow">${date}${time ? ` · ${time}` : ""}</p>
+<h3>${name}</h3>
+<p>${description}</p>
+<p>${location}</p>
+<p>${seatsRemaining} seats remaining</p>
+<button type="button" class="event-reserve-button" data-event-id="${eventId}">
+          Reserve
+</button>
+      `;
+ 
+      eventsList.appendChild(card);
+ 
+      if (eventSelect && eventId) {
+        const option = document.createElement("option");
+        option.value = eventId;
+        option.textContent = name;
+        eventSelect.appendChild(option);
+      }
+    });
+ 
+    if (eventsStatus) {
+      eventsStatus.textContent = "";
+      eventsStatus.className = "";
+    }
+  } catch (error) {
+    console.error("Final events loader error:", error);
+ 
+    if (eventsStatus) {
+      eventsStatus.textContent = error.message || "Unable to load events.";
+      eventsStatus.className = "error";
+    }
+  }
+}
+ 
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    const eventsList =
+      document.getElementById("events-list") ||
+      document.querySelector(".events-list");
+ 
+    if (!eventsList) return;
+ 
+    const existingCards = eventsList.querySelectorAll("article, .event-card, [data-event-id]");
+ 
+    if (existingCards.length >= 3) {
+      console.log("Events already rendered by the main app. Skipping fallback event renderer.");
+      return;
+    }
+ 
+    loadMelviewEventsFinal();
+  }, 700);
+});
+ 
+document.addEventListener("click", (event) => {
+  const reserveButton = event.target.closest(".event-reserve-button");
+ 
+  if (!reserveButton) return;
+ 
+  const eventId = reserveButton.dataset.eventId;
+ 
+  const eventSelect =
+    document.getElementById("eventId") ||
+    document.querySelector("[name='eventId']") ||
+    document.querySelector("select");
+ 
+  if (eventSelect && eventId) {
+    eventSelect.value = eventId;
+  }
+ 
+  const registerSection =
+    document.getElementById("register") ||
+    document.querySelector(".registration-modal") ||
+    document.querySelector("form")?.closest("section");
+ 
+  if (registerSection) {
+    registerSection.classList.add("is-open");
+    document.body.classList.add("registration-modal-open");
+  }
+});
