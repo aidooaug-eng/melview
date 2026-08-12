@@ -441,10 +441,6 @@ eventDate
 availability/status
 ```
 
-The initial project presentation demonstrated events such as:
-
-- AWS Workshop Accra 2026 — 15 May 2026 — Available
-- Cloud Solutions Summit — 28 June 2026 — Limited
 
 ---
 
@@ -1024,21 +1020,7 @@ GET /events
 
 The available events are displayed.
 
-Example events from the project scope:
 
-```text
-AWS Workshop Accra 2026
-15 May 2026
-Available
-```
-
-and:
-
-```text
-Cloud Solutions Summit
-28 June 2026
-Limited
-```
 
 ## 3. Register
 
